@@ -6,41 +6,6 @@ import socket
 # 资源根目录
 root = './example'
 
-# def makeHeader(reqDict):
-#   Eol = "\r\n"
-#   spc = " "
-#   prot = "HTTP/1.1"
-#   status = "200"
-#   statusCode = "OK"
-#   htmlContentType = "text/html; charset=utf-8"
-#   cssContentType = "text/css"
-#   jsContentType = "application/javascript"
-#   contentType = ""
-#   content = ''
-
-#   if contentTp == 'html':
-#       contentType = htmlContentType
-#   elif contentTp == 'css':
-#       contentType = cssContentType
-#   elif contentTp == 'js':
-#       contentType = jsContentType
-
-#   try:
-#       f = open(root + path, 'r')
-#       while True:
-#           chunk = f.read(1024)
-#           if not chunk:
-#               f.close()
-#               break;
-#           content += chunk
-#   except:
-#       pass
-
-#   ret = prot + spc + status + spc + statusCode + Eol + "Content-Length: " + str(len(content)) + Eol + "Content-Type: " + contentType + Eol + Eol + content
-
-#   return ret
-
-
 # 获取响应报文
 def getResponse(reqDict):
     method = reqDict['method']
@@ -61,6 +26,7 @@ def get(reqDict):
     path = '/index.html' if reqDict['sourcePath'] == '/' else reqDict['sourcePath']
     content = ''
 
+    # 获取资源内容
     try:
         f = open(root + path, 'r')
         while True:
