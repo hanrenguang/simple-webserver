@@ -4,9 +4,9 @@
 import socket
 
 # 资源根目录
-root = '.'
+root = './example'
 
-# def getResponse(contentTp, path):
+# def makeHeader(reqDict):
 #   Eol = "\r\n"
 #   spc = " "
 #   prot = "HTTP/1.1"
@@ -40,6 +40,59 @@ root = '.'
 
 #   return ret
 
+
+# 获取响应报文
+def getResponse(reqDict):
+    method = reqDict['method']
+    res = ''
+
+    if method == 'GET':
+        res = get(reqDict)
+    elif method == 'POST':
+        res = post(reqDict)
+    else:
+        pass
+
+    return res
+
+# GET
+def get(reqDict):
+    headers = 'HTTP/1.1 200 OK\r\n'
+    path = '/index.html' if reqDict['sourcePath'] == '/' else reqDict['sourcePath']
+    content = ''
+
+    try:
+        f = open(root + path, 'r')
+        while True:
+            chunk = f.read(1024)
+            if not chunk:
+                f.close()
+                break;
+            content += chunk
+    except:
+        pass
+
+    sourceType = path.split('/')[-1].split('.')[-1]
+    htmlContentType = "text/html; charset=utf-8"
+    cssContentType = "text/css"
+    jsContentType = "application/javascript"
+    contentType = ''
+
+    if sourceType == 'html':
+        contentType = htmlContentType
+    elif sourceType == 'css':
+        contentType = cssContentType
+    elif sourceType == 'js':
+        contentType = jsContentType
+    else:
+        contentType = '*'
+
+    res = headers + 'Content-Type: ' + contentType + '\r\n' + 'Content-Length: ' + str(len(content)) + '\r\n\r\n' + content
+
+    return res
+
+
+
 # 解析请求报文
 def parseReq(reqList):
     # 保存解析结果
@@ -60,7 +113,7 @@ def parseReq(reqList):
 
         idx = reqList[i].find(':')
         key, value = reqList[i][0:idx], reqList[i][idx+1:]
-        parseRet['{0}'.format(key)] = value.strip()
+        parseRet[key] = value.strip()
         i = i - 1
 
     return parseRet
@@ -88,8 +141,11 @@ def serve():
             # 解析HTTP请求报文
             ret = parseReq(requestList)
 
+            # 获取响应报文
+            response = getResponse(ret)
+
             # 返回HTTP响应报文
-            # clientSk.sendall(response.encode(encoding='UTF-8'))
+            clientSk.sendall(response.encode(encoding='UTF-8'))
             clientSk.close()
 
         except Exception as err:
