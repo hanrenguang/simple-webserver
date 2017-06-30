@@ -26,9 +26,11 @@ def get(reqDict):
     path = '/index.html' if reqDict['sourcePath'] == '/' else reqDict['sourcePath']
     content = ''
 
+    content = content.encode('utf-8')
+
     # 获取资源内容
     try:
-        f = open(root + path, 'r')
+        f = open(root + path, 'rb')
         while True:
             chunk = f.read(1024)
             if not chunk:
@@ -37,6 +39,7 @@ def get(reqDict):
             content += chunk
     except:
         pass
+
 
     sourceType = path.split('/')[-1].split('.')[-1]
     htmlContentType = "text/html; charset=utf-8"
@@ -52,6 +55,8 @@ def get(reqDict):
         contentType = jsContentType
     else:
         contentType = '*'
+
+    content = content.decode('utf-8')
 
     res = headers + 'Content-Type: ' + contentType + '\r\n' + 'Content-Length: ' + str(len(content)) + '\r\n\r\n' + content
 
@@ -111,7 +116,7 @@ def serve():
             response = getResponse(ret)
 
             # 返回HTTP响应报文
-            clientSk.sendall(response.encode(encoding='UTF-8'))
+            clientSk.sendall(response.encode('utf-8'))
             clientSk.close()
 
         except Exception as err:
